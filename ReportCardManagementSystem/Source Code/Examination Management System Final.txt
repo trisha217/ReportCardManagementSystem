@@ -1,0 +1,2960 @@
+#include <stdio.h>
+#include <string.h>
+#include <windows.h>
+#include <ctype.h>
+
+#define SUB 10
+#define SUB_LEN 20
+#define ATTENDANCE 75
+#define PASSING_MARKS 33
+
+
+struct pass
+{
+	char pass[25];
+};
+
+struct pass pa;
+
+struct student
+{
+    int roll_no;
+    char name[50];
+    long long int mob_no;
+    char email_id[50];
+    int internal_marks[SUB];
+    int external_marks[SUB];
+    int total_internal_marks;
+    int total_external_marks;
+    int total_marks;
+    int final_marks;
+    int attendance;
+    char fee_status[10];
+};
+
+struct student stud;
+
+struct requirements
+{
+    int no_of_sub;
+    int int_weightage;
+    int ext_weightage;
+    char sub_name[SUB][SUB_LEN];
+};
+
+struct requirements req;
+
+int i, j, choice;
+int x = 45, y = 20, inc = 2, inc1 = 2;
+
+FILE *fp, *fp1, *tp;
+
+
+
+
+void cust_menu()
+{
+    system("cls");
+    time_t t;
+    time(&t);
+    printf("%s\n", ctime(&t));
+    gotoxy(x,y);
+    printf("----------------------------------------------------------------------------------------------------------------------");
+    gotoxy(x,y+2);
+	printf("--------------------------------------- CHOOSE THE REQUIRED OPERATION ------------------------------------------------");
+	gotoxy(x,y+4);
+	printf("--------------------------------------- (1) Enter your requirements --------------------------------------------------");
+	gotoxy(x,y+6);
+	printf("--------------------------------------- (2) Student menu -------------------------------------------------------------");
+	gotoxy(x,y+8);
+	printf("--------------------------------------- (0) Exit System --------------------------------------------------------------");
+    gotoxy(x,y+10);
+    printf("----------------------------------------------------------------------------------------------------------------------");
+    gotoxy(x,y+12);
+    printf("Enter your choice : ");
+    scanf("%d", &choice);
+    switch(choice)
+    {
+    case 1 :
+        cust_req();
+        student_menu();
+        break;
+    case 2 :
+        student_menu();
+        break;
+    case 0 :
+        bye_bye();
+        break;
+    default :
+        gotoxy(x,y+16);
+        printf("Invalid Choice, Please Re-enter.");
+        getch();
+        cust_menu();
+    }
+}
+
+
+void student_menu()
+{
+    system("cls");
+    time_t t;
+    time(&t);
+    printf("%s\n", ctime(&t));
+    int q1, q2;
+    gotoxy(x,y);
+	printf("------------------------------------------------------------------------------------------------------------------");
+	gotoxy(x,y+2);
+	printf("--------------------------------------- CHOOSE THE REQUIRED OPERATION --------------------------------------------");
+    gotoxy(x,y+4);
+    printf("--------------------------------------- (1) Create Class ---------------------------------------------------------");
+    gotoxy(x,y+6);
+	printf("--------------------------------------- (2) Add Student ----------------------------------------------------------");
+    gotoxy(x,y+8);
+	printf("--------------------------------------- (3) Modify Student Details -----------------------------------------------");
+    gotoxy(x,y+10);
+	printf("--------------------------------------- (4) Delete Student Details -----------------------------------------------");
+    gotoxy(x,y+12);
+	printf("--------------------------------------- (5) Display Student Details ----------------------------------------------");
+    gotoxy(x,y+14);
+	printf("--------------------------------------- (6) Eligible Students for Internals --------------------------------------");
+    gotoxy(x,y+16);
+	printf("--------------------------------------- (7) Search a Student -----------------------------------------------------");
+    gotoxy(x,y+18);
+	printf("--------------------------------------- (8) Enter Marks of Student -----------------------------------------------");
+    gotoxy(x,y+20);
+	printf("--------------------------------------- (0) Exit System ----------------------------------------------------------");
+    gotoxy(x,y+22);
+    printf("------------------------------------------------------------------------------------------------------------------");
+    gotoxy(x,y+24);
+    printf("Enter your choice : ");
+    scanf("%d", &choice);
+    switch(choice)
+    {
+        case 1 :
+            create_student_info();
+            break;
+        case 2 :
+            add_student_info();
+            break;
+        case 3 :
+            q1 = modify_student_info();
+            if (q1 == 0)
+            {
+                gotoxy(x,y+2);
+                printf("Student does not exist.");
+                getch();
+            }
+            student_menu();
+            break;
+        case 4 :
+            q2 = delete_student_info();;
+            if (q2 == 0)
+            {
+                gotoxy(x,y+2);
+                printf("Student does not exist.");
+                getch();
+            }
+            else
+            {
+                gotoxy(x,y+2);
+                printf("The student details are deleted successfully.");
+                getch();
+            }
+            student_menu();
+            break;
+        case 5 :
+            display_student_info();
+            break;
+        case 6 :
+            eligible_student_info();
+            break;
+        case 7 :
+            search_menu();
+            break;
+        case 8 :
+            marks_menu();
+            break;
+        case 0 :
+            bye_bye();
+            break;
+        default :
+            gotoxy(x,y+28);
+            printf("Invalid Choice, Please Re-enter.");
+            getch();
+            student_menu();
+    }
+}
+
+
+void search_menu()
+{
+    system("cls");
+    time_t t;
+    time(&t);
+    printf("%s\n", ctime(&t));
+    gotoxy(x,y);
+	printf("------------------------------------------------------------------------------------------------------------------");
+	gotoxy(x,y+2);
+	printf("----------------------------------- CHOOSE THE REQUIRED OPERATION ------------------------------------------------");
+    gotoxy(x,y+4);
+	printf("--------------------------------------- (1) Search by Roll Number ------------------------------------------------");
+	gotoxy(x,y+6);
+	printf("--------------------------------------- (2) Search by Name -------------------------------------------------------");
+	gotoxy(x,y+8);
+	printf("--------------------------------------- (3) Search by Mobile Number ----------------------------------------------");
+	gotoxy(x,y+10);
+	printf("--------------------------------------- (4) Search by Email - ID -------------------------------------------------");
+	gotoxy(x,y+12);
+	printf("--------------------------------------- (9) Back to Student Details Menu -----------------------------------------");
+	gotoxy(x,y+14);
+    printf("--------------------------------------- (0) Exit System ----------------------------------------------------------");
+	gotoxy(x,y+16);
+    printf("------------------------------------------------------------------------------------------------------------------");
+	gotoxy(x,y+18);
+    printf("Enter your choice : ");
+    scanf("%d", &choice);
+    switch(choice)
+    {
+        case 1 :
+            search_roll_no();
+            break;
+        case 2 :
+            search_name();
+            break;
+        case 3 :
+            search_mob_no();
+            break;
+        case 4 :
+            search_email_id();
+            break;
+        case 9 :
+            student_menu();
+            break;
+        case 0 :
+            bye_bye();
+            break;
+        default :
+            gotoxy(x,y+22);
+            printf("Invalid Choice, Please Re-enter.");
+            getch();
+            search_menu();
+    }
+}
+
+
+void search_menu_internal()
+{
+    system("cls");
+    time_t t;
+    time(&t);
+    printf("%s\n", ctime(&t));
+    gotoxy(x,y);
+	printf("------------------------------------------------------------------------------------------------------------------");
+	gotoxy(x,y+2);
+	printf("----------------------------------- CHOOSE THE REQUIRED OPERATION ------------------------------------------------");
+    gotoxy(x,y+4);
+	printf("--------------------------------------- (1) Search by Roll Number ------------------------------------------------");
+	gotoxy(x,y+6);
+	printf("--------------------------------------- (2) Search by Name -------------------------------------------------------");
+	gotoxy(x,y+8);
+	printf("--------------------------------------- (3) Search by Mobile Number ----------------------------------------------");
+	gotoxy(x,y+10);
+	printf("--------------------------------------- (4) Search by Email - ID -------------------------------------------------");
+	gotoxy(x,y+12);
+	printf("--------------------------------------- (9) Back to Internal Marks Menu ------------------------------------------");
+	gotoxy(x,y+14);
+    printf("--------------------------------------- (0) Exit System ----------------------------------------------------------");
+	gotoxy(x,y+16);
+    printf("------------------------------------------------------------------------------------------------------------------");
+	gotoxy(x,y+18);
+    printf("Enter your choice : ");
+    scanf("%d", &choice);
+    switch(choice)
+    {
+        case 1 :
+            search_roll_no_internal();
+            break;
+        case 2 :
+            search_name_internal();
+            break;
+        case 3 :
+            search_mob_no_internal();
+            break;
+        case 4 :
+            search_email_id_internal();
+            break;
+        case 9 :
+            internal_marks_menu();
+            break;
+        case 0 :
+            bye_bye();
+            break;
+        default :
+            gotoxy(x,y+22);
+            printf("Invalid Choice, Please Re-enter.");
+            getch();
+            search_menu_internal();
+    }
+}
+
+
+void search_menu_external()
+{
+    system("cls");
+    time_t t;
+    time(&t);
+    printf("%s\n", ctime(&t));
+    gotoxy(x,y);
+	printf("------------------------------------------------------------------------------------------------------------------");
+	gotoxy(x,y+2);
+	printf("----------------------------------- CHOOSE THE REQUIRED OPERATION ------------------------------------------------");
+    gotoxy(x,y+4);
+	printf("--------------------------------------- (1) Search by Roll Number ------------------------------------------------");
+	gotoxy(x,y+6);
+	printf("--------------------------------------- (2) Search by Name -------------------------------------------------------");
+	gotoxy(x,y+8);
+	printf("--------------------------------------- (3) Search by Mobile Number ----------------------------------------------");
+	gotoxy(x,y+10);
+	printf("--------------------------------------- (4) Search by Email - ID -------------------------------------------------");
+	gotoxy(x,y+12);
+	printf("--------------------------------------- (9) Back to External Marks Menu ------------------------------------------");
+	gotoxy(x,y+14);
+    printf("--------------------------------------- (0) Exit System ----------------------------------------------------------");
+	gotoxy(x,y+16);
+    printf("------------------------------------------------------------------------------------------------------------------");
+	gotoxy(x,y+18);
+    printf("Enter your choice : ");
+    scanf("%d", &choice);
+    switch(choice)
+    {
+        case 1 :
+            search_roll_no_external();
+            break;
+        case 2 :
+            search_name_external();
+            break;
+        case 3 :
+            search_mob_no_external();
+            break;
+        case 4 :
+            search_email_id_external();
+            break;
+        case 9 :
+            external_marks_menu();
+            break;
+        case 0 :
+            bye_bye();
+            break;
+        default :
+            gotoxy(x,y+22);
+            printf("Invalid Choice, Please Re-enter.");
+            getch();
+    }
+}
+
+
+void search_menu_total()
+{
+    system("cls");
+    time_t t;
+    time(&t);
+    printf("%s\n", ctime(&t));
+    gotoxy(x,y);
+	printf("------------------------------------------------------------------------------------------------------------------");
+	gotoxy(x,y+2);
+	printf("----------------------------------- CHOOSE THE REQUIRED OPERATION ------------------------------------------------");
+    gotoxy(x,y+4);
+	printf("--------------------------------------- (1) Search by Roll Number ------------------------------------------------");
+	gotoxy(x,y+6);
+	printf("--------------------------------------- (2) Search by Name -------------------------------------------------------");
+	gotoxy(x,y+8);
+	printf("--------------------------------------- (3) Search by Mobile Number ----------------------------------------------");
+	gotoxy(x,y+10);
+	printf("--------------------------------------- (4) Search by Email - ID -------------------------------------------------");
+	gotoxy(x,y+12);
+	printf("--------------------------------------- (9) Back to Total Marks Menu ---------------------------------------------");
+	gotoxy(x,y+14);
+    printf("--------------------------------------- (0) Exit System ----------------------------------------------------------");
+	gotoxy(x,y+16);
+    printf("------------------------------------------------------------------------------------------------------------------");
+	gotoxy(x,y+18);
+    printf("Enter your choice : ");
+    scanf("%d", &choice);
+    switch(choice)
+    {
+        case 1 :
+            search_roll_no_total();
+            break;
+        case 2 :
+            search_name_total();
+            break;
+        case 3 :
+            search_mob_no_total();
+            break;
+        case 4 :
+            search_email_id_total();
+            break;
+        case 9 :
+            total_marks_menu();
+            break;
+        case 0 :
+            bye_bye();
+            break;
+        default :
+            gotoxy(x,y+22);
+            printf("Invalid Choice, Please Re-enter.");
+            getch();
+    }
+}
+
+
+void marks_menu()
+{
+    system("cls");
+    time_t t;
+    time(&t);
+    printf("%s\n", ctime(&t));
+    gotoxy(x,y);
+	printf("------------------------------------------------------------------------------------------------------------------");
+	gotoxy(x,y+2);
+	printf("----------------------------------- CHOOSE THE REQUIRED OPERATION ------------------------------------------------");
+    gotoxy(x,y+4);
+	printf("--------------------------------------- (1) Internal Marks -------------------------------------------------------");
+	gotoxy(x,y+6);
+	printf("--------------------------------------- (2) External Marks -------------------------------------------------------");
+	gotoxy(x,y+8);
+	printf("--------------------------------------- (3) Total Marks ----------------------------------------------------------");
+	gotoxy(x,y+10);
+	printf("--------------------------------------- (9) Back to Student Details Menu -----------------------------------------");
+	gotoxy(x,y+12);
+    printf("--------------------------------------- (0) Exit System ----------------------------------------------------------");
+	gotoxy(x,y+14);
+    printf("------------------------------------------------------------------------------------------------------------------");
+	gotoxy(x,y+16);
+    printf("Enter your choice : ");
+    scanf("%d", &choice);
+    switch(choice)
+    {
+        case 1 :
+            internal_marks_menu();
+            break;
+        case 2 :
+            external_marks_menu();
+            break;
+        case 3 :
+            total_marks_menu();
+            break;
+        case 9 :
+            student_menu();
+            break;
+        case 0 :
+            bye_bye();
+            break;
+        default :
+            gotoxy(x,y+20);
+            printf("Invalid Choice, Please Re-enter.");
+            getch();
+    }
+}
+
+
+void internal_marks_menu()
+{
+    system("cls");
+    time_t t;
+    time(&t);
+    printf("%s\n", ctime(&t));
+	gotoxy(x,y);
+	printf("------------------------------------------------------------------------------------------------------------------");
+	gotoxy(x,y+2);
+	printf("--------------------------------------- CHOOSE THE REQUIRED OPERATION --------------------------------------------");
+	gotoxy(x,y+4);
+	printf("--------------------------------------- (1) Input Internal Marks -------------------------------------------------");
+	gotoxy(x,y+6);
+	printf("--------------------------------------- (2) Input Internal Marks of newly - added Students -----------------------");
+	gotoxy(x,y+8);
+    printf("--------------------------------------- (3) Display Internal Marks -----------------------------------------------");
+	gotoxy(x,y+10);
+    printf("--------------------------------------- (4) Eligible Student for externals ---------------------------------------");
+	gotoxy(x,y+12);
+	printf("--------------------------------------- (5) Search a Student -----------------------------------------------------");
+	gotoxy(x,y+14);
+    printf("--------------------------------------- (9) Back to Marks Menu ---------------------------------------------------");
+	gotoxy(x,y+16);
+    printf("--------------------------------------- (0) Exit System ----------------------------------------------------------");
+	gotoxy(x,y+18);
+    printf("------------------------------------------------------------------------------------------------------------------");
+	gotoxy(x,y+20);
+    printf("Enter your choice : ");
+    scanf("%d", &choice);
+    switch(choice)
+    {
+        case 1 :
+            internal_marks();
+            break;
+        case 2 :
+            internal_marks_mod();
+            break;
+        case 3 :
+            display_internal_marks();
+            break;
+        case 4 :
+            eligibility_externals();
+            break;
+        case 5 :
+            search_menu_internal();
+            break;
+        case 9 :
+            marks_menu();
+            break;
+        case 0 :
+            bye_bye();
+            break;
+        default :
+            gotoxy(x,y+24);
+            printf("Invalid Choice, Please Re-enter.");
+            getch();
+    }
+}
+
+
+void external_marks_menu()
+{
+    system("cls");
+    time_t t;
+    time(&t);
+    printf("%s\n", ctime(&t));
+	gotoxy(x,y);
+	printf("------------------------------------------------------------------------------------------------------------------");
+	gotoxy(x,y+2);
+	printf("--------------------------------------- CHOOSE THE REQUIRED OPERATION --------------------------------------------");
+	gotoxy(x,y+4);
+	printf("--------------------------------------- (1) Input External Marks -------------------------------------------------");
+	gotoxy(x,y+6);
+	printf("--------------------------------------- (2) Input External Marks of newly - added Students -----------------------");
+	gotoxy(x,y+8);
+    printf("--------------------------------------- (3) Display External Marks -----------------------------------------------");
+	gotoxy(x,y+10);
+	printf("--------------------------------------- (4) Search a Student -----------------------------------------------------");
+	gotoxy(x,y+12);
+    printf("--------------------------------------- (9) Back to Marks Menu ---------------------------------------------------");
+	gotoxy(x,y+14);
+    printf("--------------------------------------- (0) Exit System ----------------------------------------------------------");
+	gotoxy(x,y+16);
+    printf("------------------------------------------------------------------------------------------------------------------");
+	gotoxy(x,y+18);
+    printf("Enter your choice : ");
+    scanf("%d", &choice);
+    switch(choice)
+    {
+        case 1 :
+            external_marks();
+            break;
+        case 2 :
+            external_marks_mod();
+            break;
+        case 3 :
+            display_external_marks();
+            break;
+        case 4 :
+            search_menu_external();
+            break;
+        case 9 :
+            marks_menu();
+            break;
+        case 0 :
+            bye_bye();
+            break;
+        default :
+            gotoxy(x,y+22);
+            printf("Invalid Choice, Please Re-enter.");
+            getch();
+    }
+}
+
+
+void total_marks_menu()
+{
+    system("cls");
+    time_t t;
+    time(&t);
+    printf("%s\n", ctime(&t));
+	gotoxy(x,y);
+	printf("------------------------------------------------------------------------------------------------------------------");
+	gotoxy(x,y+2);
+	printf("--------------------------------------- CHOOSE THE REQUIRED OPERATION --------------------------------------------");
+	gotoxy(x,y+4);
+	printf("--------------------------------------- (1) Display Total Marks --------------------------------------------------");
+	gotoxy(x,y+6);
+	printf("--------------------------------------- (2) Search a Student -----------------------------------------------------");
+	gotoxy(x,y+8);
+    printf("--------------------------------------- (9) Back to Marks Menu ---------------------------------------------------");
+	gotoxy(x,y+10);
+    printf("--------------------------------------- (0) Exit System ----------------------------------------------------------");
+	gotoxy(x,y+12);
+    printf("------------------------------------------------------------------------------------------------------------------");
+	gotoxy(x,y+14);
+    printf("Enter your choice : ");
+    scanf("%d", &choice);
+    switch(choice)
+    {
+        case 1 :
+            display_total_marks();
+            break;
+        case 2 :
+            search_menu_total();
+            break;
+        case 9 :
+            marks_menu();
+            break;
+        case 0 :
+            bye_bye();
+            break;
+        default :
+            gotoxy(x,y+18);
+            printf("Invalid Choice, Please Re-enter.");
+            getch();
+    }
+}
+
+
+void cust_req()
+{
+    system("cls");
+    fp = fopen("Subject.dat", "wb");
+    gotoxy(x,y);
+    printf("Enter the number of subjects : ");
+    scanf("%d", &req.no_of_sub);
+    for (i = 0; i < req.no_of_sub; i++)
+    {
+        gotoxy(x,y+2);
+        printf("Enter the name of subject %d : ", i+1);
+        scanf("%s", req.sub_name[i]);
+        y = y + 2;
+    }
+    gotoxy(x,y+2);
+    printf("Enter the weightage of internals : ");
+    scanf("%d", &req.int_weightage);
+    gotoxy(x,y+4);
+    printf("Enter the weightage of externals : ");
+    scanf("%d", &req.ext_weightage);
+    fwrite(&req, sizeof(req), 1, fp);
+    fclose(fp);
+}
+
+
+void create_student_info()
+{
+    system("cls");
+    int num;
+    fp1 = fopen("Student.dat", "wb");
+    gotoxy(x,y);
+    printf("Enter the number of students to be enrolled : ");
+    scanf("%d", &num);
+    for (i = 0; i < num; i++)
+    {
+        system("cls");
+        gotoxy(x,y);
+        printf("Entering the details of %d student : ", i+1);
+        gotoxy(x,y+2);
+        printf("Enter the roll number of student : ");
+        scanf("%d", &stud.roll_no);
+        fflush(stdin);
+        gotoxy(x,y+4);
+        printf("Enter the name of student : ");
+        gets(stud.name);
+        gotoxy(x,y+6);
+        printf("Enter the attendance of student : ");
+        scanf("%d", &stud.attendance);
+        gotoxy(x,y+8);
+        printf("Enter the fee status of student : ");
+        scanf("%s", stud.fee_status);
+        gotoxy(x,y+10);
+        printf("Enter the mobile number of student : ");
+        scanf("%lld", &stud.mob_no);
+        gotoxy(x,y+12);
+        printf("Enter the email - id of student : ");
+        scanf("%s", stud.email_id);
+        fwrite(&stud, sizeof(stud), 1, fp1);
+    }
+    fclose(fp1);
+    system("cls");
+    gotoxy(x,y);
+    printf("%d number of students are added.\n", num);
+    gotoxy(x,y+2);
+    printf("Press any key to get back to the student menu.");
+    getch();
+    student_menu();
+}
+
+
+void add_student_info()
+{
+    system("cls");
+    int roll;
+    char more;
+    fp = fopen("Subject.dat", "rb");
+    while(fread(&req, sizeof(req), 1, fp) > 0)
+    {
+    fp1 = fopen("Student.dat", "ab+");
+    gotoxy(x,y);
+    printf("Enter a roll number to check if it previously exists : ");
+    scanf("%d", &roll);
+    while(fread(&stud, sizeof(stud), 1, fp1) > 0)
+    {
+        if (stud.roll_no == roll)
+        {
+            goto out;
+        }
+    }
+    system("cls");
+    gotoxy(x,y);
+    printf("Enter the roll number of student : ");
+    scanf("%d", &stud.roll_no);
+    fflush(stdin);
+    gotoxy(x,y+2);
+    printf("Enter the name of student : ");
+    gets(stud.name);
+    gotoxy(x,y+4);
+    printf("Enter the attendance of student : ");
+    scanf("%d", &stud.attendance);
+    gotoxy(x,y+6);
+    printf("Enter the fee status of student : ");
+    scanf("%s", stud.fee_status);
+    gotoxy(x,y+8);
+    printf("Enter the mobile number of student : ");
+    scanf("%lld", &stud.mob_no);
+    gotoxy(x,y+10);
+    printf("Enter the email - id of student : ");
+    scanf("%s", stud.email_id);
+    for (i = 0; i < req.no_of_sub; i++)
+    {
+        stud.internal_marks[i] = 0;
+    }
+    stud.total_internal_marks = 0;
+    for (i = 0; i < req.no_of_sub; i++)
+    {
+        stud.external_marks[i] = 0;
+    }
+    stud.total_external_marks = 0;
+    stud.total_marks = 0;
+    fwrite(&stud, sizeof(stud), 1, fp1);
+    fclose(fp1);
+    gotoxy(x,y+14);
+    printf("Student added successfully.\n");
+    gotoxy(x,y+16);
+    printf("Do you want to add more students?\n");
+    gotoxy(x,y+18);
+    printf("Press 'Y' for Yes and 'N' for No.\n");
+    gotoxy(x,y+20);
+	scanf("%s", &more);
+	if (more == 'Y' || more == 'y')
+	{
+		add_student_info();
+	}
+	else if (more == 'n' || more == 'N')
+	{
+		student_menu();
+	}
+	else
+    {
+        system("cls");
+        gotoxy(x,y);
+        printf("Invalid Choice!\n");
+        gotoxy(x,y+2);
+        printf("Press any key to get back to the student menu.");
+        getch();
+		student_menu();
+    }
+    out:
+        gotoxy(x,y+2);
+        printf("Roll Number already exists.");
+        gotoxy(x,y+4);
+        printf("Press any key to get back to the student menu.");
+        getch();
+        student_menu();
+    }
+}
+
+
+int modify_student_info()
+{
+    system("cls");
+    int mod, flag = 0;
+    fp1 = fopen("Student.dat", "rb+");
+    gotoxy(x,y);
+    printf("Enter the roll number of student whose details are to be modified : ");
+    scanf("%d", &mod);
+    while(fread(&stud, sizeof(stud), 1, fp1) > 0)
+    {
+        if (stud.roll_no == mod)
+        {
+            flag = 1;
+            system("cls");
+            gotoxy(x,y);
+            printf("Student Details Found.\n");
+            gotoxy(x,y+2);
+            printf("Enter the roll number of student : ");
+            scanf("%d", &stud.roll_no);
+            fflush(stdin);
+            gotoxy(x,y+4);
+            printf("Enter the name of student : ");
+            gets(stud.name);
+            gotoxy(x,y+6);
+            printf("Enter the attendance of student : ");
+            scanf("%d", &stud.attendance);
+            gotoxy(x,y+8);
+            printf("Enter the fee status of student : ");
+            scanf("%s", stud.fee_status);
+            gotoxy(x,y+10);
+            printf("Enter the mobile number of student : ");
+            scanf("%lld", &stud.mob_no);
+            gotoxy(x,y+12);
+            printf("Enter the email - id of student : ");
+            scanf("%s", stud.email_id);
+            fseek(fp1, -sizeof(stud), 1);
+            fwrite(&stud, sizeof(stud), 1, fp1);
+            gotoxy(x,y+16);
+            printf("Record updated successfully");
+            gotoxy(x,y+18);
+            getch();
+            break;
+        }
+    }
+    fclose(fp1);
+    return flag;
+}
+
+
+int delete_student_info()
+{
+    system("cls");
+    int del, flag = 0;
+    int count = 0;
+    FILE *fp2;
+    fp2 = fopen("Temp.dat", "ab");
+    fp1 = fopen("Student.dat", "rb");
+    fflush(stdin);
+    gotoxy(x,y);
+    printf("Enter the roll number of students whose details are to be deleted : ");
+    scanf("%d", &del);
+    while(fread(&stud, sizeof(stud), 1, fp1) > 0)
+    {
+        if(stud.roll_no == del)
+        {
+            flag = 1;
+            continue;
+        }
+        else
+        {
+            fwrite(&stud, sizeof(stud), 1, fp2);
+        }
+        count++;
+    }
+    fclose(fp1);
+    fclose(fp2);
+    remove("Student.dat");
+    rename("Temp.dat", "Student.dat");
+    return flag;
+}
+
+
+void display_student_info()
+{
+    system("cls");
+    fp1 = fopen("Student.dat", "rb");
+    while(fread(&stud, sizeof(stud), 1, fp1) > 0)
+    {
+        gotoxy(x,y+inc);
+        printf("Roll Number = %d", stud.roll_no);
+        gotoxy(x,y+inc+2);
+        printf("Name = %s", stud.name);
+        gotoxy(x,y+inc+4);
+        printf("Attendance = %d", stud.attendance);
+        gotoxy(x,y+inc+6);
+        printf("Fee Status = %s", stud.fee_status);
+        gotoxy(x,y+inc+8);
+        printf("Mobile Number = %lld", stud.mob_no);
+        gotoxy(x,y+inc+10);
+        printf("Email - ID = %s", stud.email_id);
+        inc = inc + 14;
+    }
+    fclose(fp1);
+    gotoxy(x,y+inc);
+    printf("Press any key to get back to the student menu.");
+    getch();
+    student_menu();
+}
+
+
+void eligible_student_info()
+{
+    system("cls");
+    int count, res;
+    fp1 = fopen("Student.dat", "rb");
+    while(fread(&stud, sizeof(stud), 1, fp1) > 0)
+    {
+        if (stud.attendance < ATTENDANCE)
+        {
+            goto out;
+        }
+        else
+        {
+            res = strcmp(stud.fee_status, "Paid");
+            count = 0;
+            if (res == 0)
+            {
+                count++;
+            }
+            if (count != 0)
+            {
+                gotoxy(x,y+inc);
+                printf("Roll Number = %d\t", stud.roll_no);
+                gotoxy(x,y+inc+2);
+                printf("Student Name = %s\t\n", stud.name);
+                gotoxy(x,y+inc+4);
+                printf("Mobile Number = %lld", stud.mob_no);
+                gotoxy(x,y+inc+6);
+                printf("Email - ID = %s", stud.email_id);
+                inc = inc + 10;
+            }
+            out:
+                continue;
+        }
+    }
+    gotoxy(x,y+inc);
+    printf("Press any key to get back to the student menu.");
+    getch();
+    student_menu();
+}
+
+
+void search_roll_no()
+{
+    system("cls");
+    int roll;
+    gotoxy(x,y);
+    printf("Enter the roll number of student whose record is to be searched : ");
+    scanf("%d", &roll);
+    fp = fopen("Subject.dat", "rb");
+    while (fread(&req, sizeof(req), 1, fp) > 0)
+    {
+        fp1 = fopen ("Student.dat", "rb");
+        while (fread(&stud, sizeof(stud), 1, fp1) > 0)
+        {
+            if (stud.roll_no == roll)
+            {
+                system("cls");
+                gotoxy(x,y);
+                printf("Roll Number = %d\n", stud.roll_no);
+                gotoxy(x,y+2);
+                printf("Name = %s\n", stud.name);
+                gotoxy(x,y+4);
+                printf("Mobile Number = %lld", stud.mob_no);
+                gotoxy(x,y+6);
+                printf("Email - ID = %s", stud.email_id);
+                gotoxy(x,y+10);
+                printf("Press any key to get back to the search menu.");
+                getch();
+                search_menu();
+            }
+        }
+        system("cls");
+        gotoxy(x,y);
+        printf("Student does not exist.\n");
+        gotoxy(x,y+2);
+        printf("Press any key to get back to the search menu.");
+        getch();
+        search_menu();
+    }
+}
+
+
+void search_name()
+{
+    system("cls");
+    char name[50];
+    gotoxy(x,y);
+    printf("Enter the name of student whose record is to be searched : ");
+    scanf("%s", name);
+    fp = fopen("Subject.dat", "rb");
+    while (fread(&req, sizeof(req), 1, fp) > 0)
+    {
+        fp1 = fopen ("Student.dat", "rb");
+        while (fread(&stud, sizeof(stud), 1, fp1) > 0)
+        {
+            if (strcmp(stud.name, name) == 0)
+            {
+                system("cls");
+                gotoxy(x,y);
+                printf("Roll Number = %d\n", stud.roll_no);
+                gotoxy(x,y+2);
+                printf("Name = %s\n", stud.name);
+                gotoxy(x,y+4);
+                printf("Mobile Number = %lld", stud.mob_no);
+                gotoxy(x,y+6);
+                printf("Email - ID = %s", stud.email_id);
+                gotoxy(x,y+10);
+                printf("Press any key to get back to the search menu.");
+                getch();
+                search_menu();
+            }
+        }
+        system("cls");
+        gotoxy(x,y);
+        printf("Student does not exist.\n");
+        gotoxy(x,y+2);
+        printf("Press any key to get back to the search menu.");
+        getch();
+        search_menu();
+    }
+}
+
+
+void search_mob_no()
+{
+    system("cls");
+    long long int mob_no;
+    gotoxy(x,y);
+    printf("Enter the mobile number of student whose record is to be searched : ");
+    scanf("%lld", &mob_no);
+    fp = fopen("Subject.dat", "rb");
+    while (fread(&req, sizeof(req), 1, fp) > 0)
+    {
+        fp1 = fopen ("Student.dat", "rb");
+        while (fread(&stud, sizeof(stud), 1, fp1) > 0)
+        {
+            if (stud.mob_no == mob_no)
+            {
+                system("cls");
+                gotoxy(x,y);
+                printf("Roll Number = %d\n", stud.roll_no);
+                gotoxy(x,y+2);
+                printf("Name = %s\n", stud.name);
+                gotoxy(x,y+4);
+                printf("Mobile Number = %lld", stud.mob_no);
+                gotoxy(x,y+6);
+                printf("Email - ID = %s", stud.email_id);
+                gotoxy(x,y+10);
+                printf("Press any key to get back to the search menu.");
+                getch();
+                search_menu();
+            }
+        }
+        system("cls");
+        gotoxy(x,y);
+        printf("Student does not exist.\n");
+        gotoxy(x,y+2);
+        printf("Press any key to get back to the search menu.");
+        getch();
+        search_menu();
+    }
+}
+
+
+void search_email_id()
+{
+    system("cls");
+    char email_id[50];
+    gotoxy(x,y);
+    printf("Enter the email - id of student whose record is to be searched : ");
+    scanf("%s", email_id);
+    fp = fopen("Subject.dat", "rb");
+    while (fread(&req, sizeof(req), 1, fp) > 0)
+    {
+        fp1 = fopen ("Student.dat", "rb");
+        while (fread(&stud, sizeof(stud), 1, fp1) > 0)
+        {
+            if (strcmp(stud.email_id, email_id) == 0)
+            {
+                system("cls");
+                gotoxy(x,y);
+                printf("Roll Number = %d\n", stud.roll_no);
+                gotoxy(x,y+2);
+                printf("Name = %s\n", stud.name);
+                gotoxy(x,y+4);
+                printf("Mobile Number = %lld", stud.mob_no);
+                gotoxy(x,y+6);
+                printf("Email - ID = %s", stud.email_id);
+                gotoxy(x,y+10);
+                printf("Press any key to get back to the search menu.");
+                getch();
+                search_menu();
+            }
+        }
+        system("cls");
+        gotoxy(x,y);
+        printf("Student does not exist.\n");
+        gotoxy(x,y+2);
+        printf("Press any key to get back to the search menu.");
+        getch();
+        search_menu();
+    }
+}
+
+
+void search_roll_no_internal()
+{
+    system("cls");
+    int roll;
+    gotoxy(x,y);
+    printf("Enter the roll number of student whose record is to be searched : ");
+    scanf("%d", &roll);
+    fp = fopen("Subject.dat", "rb");
+    while (fread(&req, sizeof(req), 1, fp) > 0)
+    {
+        fp1 = fopen ("Student.dat", "rb");
+        while (fread(&stud, sizeof(stud), 1, fp1) > 0)
+        {
+            if (stud.roll_no == roll)
+            {
+                system("cls");
+                gotoxy(x,y);
+                printf("Roll Number = %d\n", stud.roll_no);
+                gotoxy(x,y+2);
+                printf("Name = %s\n", stud.name);
+                gotoxy(x,y+4);
+                printf("Mobile Number = %lld", stud.mob_no);
+                gotoxy(x,y+6);
+                printf("Email - ID = %s", stud.email_id);
+                gotoxy(x,y+8);
+                printf("Internal Marks in : ");
+                inc = 2;
+                for (i = 0; i < req.no_of_sub; i++)
+                {
+                    gotoxy(x,y+inc+8);
+                    printf("%s : %d\n", req.sub_name[i], stud.internal_marks[i]);
+                    inc = inc + 2;
+                }
+                gotoxy(x,y+inc+8);
+                printf("Total Marks in Internals are : %d\n", stud.total_internal_marks);
+                gotoxy(x,y+inc+12);
+                printf("Press any key to get back to the search menu.");
+                getch();
+                search_menu_internal();
+            }
+        }
+        system("cls");
+        gotoxy(x,y);
+        printf("Student does not exist.\n");
+        gotoxy(x,y+2);
+        printf("Press any key to get back to the search menu.");
+        getch();
+        search_menu_internal();
+    }
+}
+
+
+void search_name_internal()
+{
+    system("cls");
+    char name[50];
+    gotoxy(x,y);
+    printf("Enter the name of student whose record is to be searched : ");
+    scanf("%s", name);
+    fp = fopen("Subject.dat", "rb");
+    while (fread(&req, sizeof(req), 1, fp) > 0)
+    {
+        fp1 = fopen ("Student.dat", "rb");
+        while (fread(&stud, sizeof(stud), 1, fp1) > 0)
+        {
+            if (strcmp(stud.name, name) == 0)
+            {
+                system("cls");
+                gotoxy(x,y);
+                printf("Roll Number = %d\n", stud.roll_no);
+                gotoxy(x,y+2);
+                printf("Name = %s\n", stud.name);
+                gotoxy(x,y+4);
+                printf("Mobile Number = %lld", stud.mob_no);
+                gotoxy(x,y+6);
+                printf("Email - ID = %s", stud.email_id);
+                gotoxy(x,y+8);
+                printf("Internal Marks in : ");
+                inc = 2;
+                for (i = 0; i < req.no_of_sub; i++)
+                {
+                    gotoxy(x,y+inc+8);
+                    printf("%s : %d\n", req.sub_name[i], stud.internal_marks[i]);
+                    inc = inc + 2;
+                }
+                gotoxy(x,y+inc+8);
+                printf("Total Marks in Internals are : %d\n", stud.total_internal_marks);
+                gotoxy(x,y+inc+12);
+                printf("Press any key to get back to the search menu.");
+                getch();
+                search_menu_internal();
+            }
+        }
+        system("cls");
+        gotoxy(x,y);
+        printf("Student does not exist.\n");
+        gotoxy(x,y+2);
+        printf("Press any key to get back to the search menu.");
+        getch();
+        search_menu_internal();
+    }
+}
+
+
+void search_mob_no_internal()
+{
+    system("cls");
+    long long int mob_no;
+    gotoxy(x,y);
+    printf("Enter the mobile number of student whose record is to be searched : ");
+    scanf("%lld", &mob_no);
+    fp = fopen("Subject.dat", "rb");
+    while (fread(&req, sizeof(req), 1, fp) > 0)
+    {
+        fp1 = fopen ("Student.dat", "rb");
+        while (fread(&stud, sizeof(stud), 1, fp1) > 0)
+        {
+            if (stud.mob_no == mob_no)
+            {
+                system("cls");
+                gotoxy(x,y);
+                printf("Roll Number = %d\n", stud.roll_no);
+                gotoxy(x,y+2);
+                printf("Name = %s\n", stud.name);
+                gotoxy(x,y+4);
+                printf("Mobile Number = %lld", stud.mob_no);
+                gotoxy(x,y+6);
+                printf("Email - ID = %s", stud.email_id);
+                gotoxy(x,y+8);
+                printf("Internal Marks in : ");
+                inc = 2;
+                for (i = 0; i < req.no_of_sub; i++)
+                {
+                    gotoxy(x,y+inc+8);
+                    printf("%s : %d\n", req.sub_name[i], stud.internal_marks[i]);
+                    inc = inc + 2;
+                }
+                gotoxy(x,y+inc+8);
+                printf("Total Marks in Internals are : %d\n", stud.total_internal_marks);
+                gotoxy(x,y+inc+12);
+                printf("Press any key to get back to the search menu.");
+                getch();
+                search_menu_internal();
+            }
+        }
+        system("cls");
+        gotoxy(x,y);
+        printf("Student does not exist.\n");
+        gotoxy(x,y+2);
+        printf("Press any key to get back to the search menu.");
+        getch();
+        search_menu_internal();
+    }
+}
+
+
+void search_email_id_internal()
+{
+    system("cls");
+    char email_id[50];
+    gotoxy(x,y);
+    printf("Enter the email - id of student whose record is to be searched : ");
+    scanf("%s", email_id);
+    fp = fopen("Subject.dat", "rb");
+    while (fread(&req, sizeof(req), 1, fp) > 0)
+    {
+        fp1 = fopen ("Student.dat", "rb");
+        while (fread(&stud, sizeof(stud), 1, fp1) > 0)
+        {
+            if (strcmp(stud.email_id, email_id) == 0)
+            {
+                system("cls");
+                gotoxy(x,y);
+                printf("Roll Number = %d\n", stud.roll_no);
+                gotoxy(x,y+2);
+                printf("Name = %s\n", stud.name);
+                gotoxy(x,y+4);
+                printf("Mobile Number = %lld", stud.mob_no);
+                gotoxy(x,y+6);
+                printf("Email - ID = %s", stud.email_id);
+                gotoxy(x,y+8);
+                printf("Internal Marks in : ");
+                inc = 2;
+                for (i = 0; i < req.no_of_sub; i++)
+                {
+                    gotoxy(x,y+inc+8);
+                    printf("%s : %d\n", req.sub_name[i], stud.internal_marks[i]);
+                    inc = inc + 2;
+                }
+                gotoxy(x,y+inc+8);
+                printf("Total Marks in Internals are : %d\n", stud.total_internal_marks);
+                gotoxy(x,y+inc+12);
+                printf("Press any key to get back to the search menu.");
+                getch();
+                search_menu_internal();
+            }
+        }
+        system("cls");
+        gotoxy(x,y);
+        printf("Student does not exist.\n");
+        gotoxy(x,y+2);
+        printf("Press any key to get back to the search menu.");
+        getch();
+        search_menu_internal();
+    }
+}
+
+
+void search_roll_no_external()
+{
+    system("cls");
+    int roll;
+    gotoxy(x,y);
+    printf("Enter the roll number of student whose record is to be searched : ");
+    scanf("%d", &roll);
+    fp = fopen("Subject.dat", "rb");
+    while (fread(&req, sizeof(req), 1, fp) > 0)
+    {
+        fp1 = fopen ("Student.dat", "rb");
+        while (fread(&stud, sizeof(stud), 1, fp1) > 0)
+        {
+            if (stud.roll_no == roll)
+            {
+                system("cls");
+                gotoxy(x,y);
+                printf("Roll Number = %d\n", stud.roll_no);
+                gotoxy(x,y+2);
+                printf("Name = %s\n", stud.name);
+                gotoxy(x,y+4);
+                printf("Mobile Number = %lld", stud.mob_no);
+                gotoxy(x,y+6);
+                printf("Email - ID = %s", stud.email_id);
+                gotoxy(x,y+8);
+                printf("External Marks in : ");
+                inc = 2;
+                for (i = 0; i < req.no_of_sub; i++)
+                {
+                    gotoxy(x,y+inc+8);
+                    printf("%s : %d\n", req.sub_name[i], stud.external_marks[i]);
+                    inc = inc + 2;
+                }
+                gotoxy(x,y+inc+8);
+                printf("Total Marks in Externals are : %d\n", stud.total_external_marks);
+                gotoxy(x,y+inc+12);
+                printf("Press any key to get back to the search menu.");
+                getch();
+                search_menu_external();
+            }
+        }
+        system("cls");
+        gotoxy(x,y);
+        printf("Student does not exist.\n");
+        gotoxy(x,y+2);
+        printf("Press any key to get back to the search menu.");
+        getch();
+        search_menu_external();
+    }
+}
+
+
+void search_name_external()
+{
+    system("cls");
+    char name[50];
+    gotoxy(x,y);
+    printf("Enter the name of student whose record is to be searched : ");
+    scanf("%s", name);
+    fp = fopen("Subject.dat", "rb");
+    while (fread(&req, sizeof(req), 1, fp) > 0)
+    {
+        fp1 = fopen ("Student.dat", "rb");
+        while (fread(&stud, sizeof(stud), 1, fp1) > 0)
+        {
+            if (strcmp(stud.name, name) == 0)
+            {
+                system("cls");
+                gotoxy(x,y);
+                printf("Roll Number = %d\n", stud.roll_no);
+                gotoxy(x,y+2);
+                printf("Name = %s\n", stud.name);
+                gotoxy(x,y+4);
+                printf("Mobile Number = %lld", stud.mob_no);
+                gotoxy(x,y+6);
+                printf("Email - ID = %s", stud.email_id);
+                gotoxy(x,y+8);
+                printf("External Marks in : ");
+                inc = 2;
+                for (i = 0; i < req.no_of_sub; i++)
+                {
+                    gotoxy(x,y+inc+8);
+                    printf("%s : %d\n", req.sub_name[i], stud.external_marks[i]);
+                    inc = inc + 2;
+                }
+                gotoxy(x,y+inc+8);
+                printf("Total Marks in Externals are : %d\n", stud.total_external_marks);
+                gotoxy(x,y+inc+12);
+                printf("Press any key to get back to the search menu.");
+                getch();
+                search_menu_external();
+            }
+        }
+        system("cls");
+        gotoxy(x,y);
+        printf("Student does not exist.\n");
+        gotoxy(x,y+2);
+        printf("Press any key to get back to the search menu.");
+        getch();
+        search_menu_external();
+    }
+}
+
+
+void search_mob_no_external()
+{
+    system("cls");
+    long long int mob_no;
+    gotoxy(x,y);
+    printf("Enter the mobile number of student whose record is to be searched : ");
+    scanf("%lld", &mob_no);
+    fp = fopen("Subject.dat", "rb");
+    while (fread(&req, sizeof(req), 1, fp) > 0)
+    {
+        fp1 = fopen ("Student.dat", "rb");
+        while (fread(&stud, sizeof(stud), 1, fp1) > 0)
+        {
+            if (stud.mob_no == mob_no)
+            {
+                system("cls");
+                gotoxy(x,y);
+                printf("Roll Number = %d\n", stud.roll_no);
+                gotoxy(x,y+2);
+                printf("Name = %s\n", stud.name);
+                gotoxy(x,y+4);
+                printf("Mobile Number = %lld", stud.mob_no);
+                gotoxy(x,y+6);
+                printf("Email - ID = %s", stud.email_id);
+                gotoxy(x,y+8);
+                printf("External Marks in : ");
+                inc = 2;
+                for (i = 0; i < req.no_of_sub; i++)
+                {
+                    gotoxy(x,y+inc+8);
+                    printf("%s : %d\n", req.sub_name[i], stud.external_marks[i]);
+                    inc = inc + 2;
+                }
+                gotoxy(x,y+inc+8);
+                printf("Total Marks in Externals are : %d\n", stud.total_external_marks);
+                gotoxy(x,y+inc+12);
+                printf("Press any key to get back to the search menu.");
+                getch();
+                search_menu_external();
+            }
+        }
+        system("cls");
+        gotoxy(x,y);
+        printf("Student does not exist.\n");
+        gotoxy(x,y+2);
+        printf("Press any key to get back to the search menu.");
+        getch();
+        search_menu_external();
+    }
+}
+
+
+void search_email_id_external()
+{
+    system("cls");
+    char email_id[50];
+    gotoxy(x,y);
+    printf("Enter the email - id of student whose record is to be searched : ");
+    scanf("%s", email_id);
+    fp = fopen("Subject.dat", "rb");
+    while (fread(&req, sizeof(req), 1, fp) > 0)
+    {
+        fp1 = fopen ("Student.dat", "rb");
+        while (fread(&stud, sizeof(stud), 1, fp1) > 0)
+        {
+            if (strcmp(stud.email_id, email_id) == 0)
+            {
+                system("cls");
+                gotoxy(x,y);
+                printf("Roll Number = %d\n", stud.roll_no);
+                gotoxy(x,y+2);
+                printf("Name = %s\n", stud.name);
+                gotoxy(x,y+4);
+                printf("Mobile Number = %lld", stud.mob_no);
+                gotoxy(x,y+6);
+                printf("Email - ID = %s", stud.email_id);
+                gotoxy(x,y+8);
+                printf("External Marks in : ");
+                inc = 2;
+                for (i = 0; i < req.no_of_sub; i++)
+                {
+                    gotoxy(x,y+inc+8);
+                    printf("%s : %d\n", req.sub_name[i], stud.external_marks[i]);
+                    inc = inc + 2;
+                }
+                gotoxy(x,y+inc+8);
+                printf("Total Marks in Externals are : %d\n", stud.total_external_marks);
+                gotoxy(x,y+inc+12);
+                printf("Press any key to get back to the search menu.");
+                getch();
+                search_menu_external();
+            }
+        }
+        system("cls");
+        gotoxy(x,y);
+        printf("Student does not exist.\n");
+        gotoxy(x,y+2);
+        printf("Press any key to get back to the search menu.");
+        getch();
+        search_menu_external();
+    }
+}
+
+
+void search_roll_no_total()
+{
+    system("cls");
+    int roll;
+    gotoxy(x,y);
+    printf("Enter the roll number of student whose record is to be searched : ");
+    scanf("%d", &roll);
+    fp = fopen("Subject.dat", "rb");
+    while (fread(&req, sizeof(req), 1, fp) > 0)
+    {
+        fp1 = fopen ("Student.dat", "rb");
+        while (fread(&stud, sizeof(stud), 1, fp1) > 0)
+        {
+            if (stud.roll_no == roll)
+            {
+                int x = 45, y = 10;
+                system("cls");
+                gotoxy(x,y+inc+inc1);
+                printf("Roll Number = %d\n", stud.roll_no);
+                gotoxy(x+55,y+inc+inc1);
+                printf("Name = %s\n", stud.name);
+                gotoxy(x+15,y+inc+inc1+2);
+                printf("Internal Marks   External Marks   Total Marks  Grade\n");
+                stud.final_marks = 0;
+                for (i = 0; i < req.no_of_sub; i++)
+                {
+                    stud.total_marks = (((stud.internal_marks[i]*req.int_weightage)/100) + ((stud.external_marks[i]*req.ext_weightage)/100));
+                    gotoxy(x,y+inc+inc1+4);
+                    printf("%3s%22d%16d%15d\n", req.sub_name[i], stud.internal_marks[i], stud.external_marks[i], stud.total_marks);
+                    stud.final_marks = stud.final_marks + stud.total_marks;
+                    inc = inc + 2;
+                }
+                gotoxy(x,y+inc+inc1+4);
+                printf("Total Marks %13d%16d%15d\t     ", stud.total_internal_marks, stud.total_external_marks, stud.final_marks);
+                if (stud.final_marks > req.no_of_sub*90)
+                {
+                    printf("A1\n\n");
+                }
+                else if (stud.final_marks > req.no_of_sub*80 && stud.final_marks <= req.no_of_sub*90)
+                {
+                    printf("A2\n\n");
+                }
+                else if (stud.final_marks > req.no_of_sub*70 && stud.final_marks <= req.no_of_sub*80)
+                {
+                    printf("B1\n\n");
+                }
+                else if (stud.final_marks > req.no_of_sub*60 && stud.final_marks <= req.no_of_sub*70)
+                {
+                    printf("B2\n\n");
+                }
+                else if (stud.final_marks > req.no_of_sub*50 && stud.final_marks <= req.no_of_sub*60)
+                {
+                    printf("C1\n\n");
+                }
+                else if (stud.final_marks > req.no_of_sub*40 && stud.final_marks <= req.no_of_sub*50)
+                {
+                    printf("C2\n\n");
+                }
+                else if (stud.final_marks > req.no_of_sub*30 && stud.final_marks <= req.no_of_sub*40)
+                {
+                    printf("D1\n\n");
+                }
+                else if (stud.final_marks > req.no_of_sub*20 && stud.final_marks <= req.no_of_sub*10)
+                {
+                    printf("D2\n\n");
+                }
+                else if (stud.final_marks > req.no_of_sub*10 && stud.final_marks <= req.no_of_sub*20)
+                {
+                    printf("E1\n\n");
+                }
+                else if (stud.final_marks > req.no_of_sub*0 && stud.final_marks <= req.no_of_sub*10)
+                {
+                    printf("E2\n\n");
+                }
+                gotoxy(x,y+inc+inc1+8);
+                printf("------------------------------------------------------------------------");
+                inc = inc + 12;
+                gotoxy(x,y+inc+inc1+12);
+                printf("Press any key to get back to the search menu.");
+                getch();
+                search_menu_total();
+            }
+        }
+        system("cls");
+        gotoxy(x,y);
+        printf("Student does not exist.\n");
+        gotoxy(x,y+2);
+        printf("Press any key to get back to the search menu.");
+        getch();
+        search_menu_total();
+    }
+}
+
+
+void search_name_total()
+{
+    system("cls");
+    char name[50];
+    gotoxy(x,y);
+    printf("Enter the name of student whose record is to be searched : ");
+    scanf("%s", name);
+    fp = fopen("Subject.dat", "rb");
+    while (fread(&req, sizeof(req), 1, fp) > 0)
+    {
+        fp1 = fopen ("Student.dat", "rb");
+        while (fread(&stud, sizeof(stud), 1, fp1) > 0)
+        {
+            if (strcmp(stud.name, name) == 0)
+            {
+                int x = 45, y = 10;
+                system("cls");
+                gotoxy(x,y+inc+inc1);
+                printf("Roll Number = %d\n", stud.roll_no);
+                gotoxy(x+55,y+inc+inc1);
+                printf("Name = %s\n", stud.name);
+                gotoxy(x+15,y+inc+inc1+2);
+                printf("Internal Marks   External Marks   Total Marks  Grade\n");
+                stud.final_marks = 0;
+                for (i = 0; i < req.no_of_sub; i++)
+                {
+                    stud.total_marks = (((stud.internal_marks[i]*req.int_weightage)/100) + ((stud.external_marks[i]*req.ext_weightage)/100));
+                    gotoxy(x,y+inc+inc1+4);
+                    printf("%3s%22d%16d%15d\n", req.sub_name[i], stud.internal_marks[i], stud.external_marks[i], stud.total_marks);
+                    stud.final_marks = stud.final_marks + stud.total_marks;
+                    inc = inc + 2;
+                }
+                gotoxy(x,y+inc+inc1+4);
+                printf("Total Marks %13d%16d%15d\t     ", stud.total_internal_marks, stud.total_external_marks, stud.final_marks);
+                if (stud.final_marks > req.no_of_sub*90)
+                {
+                    printf("A1\n\n");
+                }
+                else if (stud.final_marks > req.no_of_sub*80 && stud.final_marks <= req.no_of_sub*90)
+                {
+                    printf("A2\n\n");
+                }
+                else if (stud.final_marks > req.no_of_sub*70 && stud.final_marks <= req.no_of_sub*80)
+                {
+                    printf("B1\n\n");
+                }
+                else if (stud.final_marks > req.no_of_sub*60 && stud.final_marks <= req.no_of_sub*70)
+                {
+                    printf("B2\n\n");
+                }
+                else if (stud.final_marks > req.no_of_sub*50 && stud.final_marks <= req.no_of_sub*60)
+                {
+                    printf("C1\n\n");
+                }
+                else if (stud.final_marks > req.no_of_sub*40 && stud.final_marks <= req.no_of_sub*50)
+                {
+                    printf("C2\n\n");
+                }
+                else if (stud.final_marks > req.no_of_sub*30 && stud.final_marks <= req.no_of_sub*40)
+                {
+                    printf("D1\n\n");
+                }
+                else if (stud.final_marks > req.no_of_sub*20 && stud.final_marks <= req.no_of_sub*10)
+                {
+                    printf("D2\n\n");
+                }
+                else if (stud.final_marks > req.no_of_sub*10 && stud.final_marks <= req.no_of_sub*20)
+                {
+                    printf("E1\n\n");
+                }
+                else if (stud.final_marks > req.no_of_sub*0 && stud.final_marks <= req.no_of_sub*10)
+                {
+                    printf("E2\n\n");
+                }
+                gotoxy(x,y+inc+inc1+8);
+                printf("------------------------------------------------------------------------");
+                inc = inc + 12;
+                gotoxy(x,y+inc+inc1+12);
+                printf("Press any key to get back to the search menu.");
+                getch();
+                search_menu_total();
+            }
+        }
+        system("cls");
+        gotoxy(x,y);
+        printf("Student does not exist.\n");
+        gotoxy(x,y+2);
+        printf("Press any key to get back to the search menu.");
+        getch();
+        search_menu_total();
+    }
+}
+
+
+void search_mob_no_total()
+{
+    system("cls");
+    long long int mob_no;
+    gotoxy(x,y);
+    printf("Enter the mobile number of student whose record is to be searched : ");
+    scanf("%lld", &mob_no);
+    fp = fopen("Subject.dat", "rb");
+    while (fread(&req, sizeof(req), 1, fp) > 0)
+    {
+        fp1 = fopen ("Student.dat", "rb");
+        while (fread(&stud, sizeof(stud), 1, fp1) > 0)
+        {
+            if (stud.mob_no == mob_no)
+            {
+                int x = 45, y = 10;
+                system("cls");
+                gotoxy(x,y+inc+inc1);
+                printf("Roll Number = %d\n", stud.roll_no);
+                gotoxy(x+55,y+inc+inc1);
+                printf("Name = %s\n", stud.name);
+                gotoxy(x+15,y+inc+inc1+2);
+                printf("Internal Marks   External Marks   Total Marks  Grade\n");
+                stud.final_marks = 0;
+                for (i = 0; i < req.no_of_sub; i++)
+                {
+                    stud.total_marks = (((stud.internal_marks[i]*req.int_weightage)/100) + ((stud.external_marks[i]*req.ext_weightage)/100));
+                    gotoxy(x,y+inc+inc1+4);
+                    printf("%3s%22d%16d%15d\n", req.sub_name[i], stud.internal_marks[i], stud.external_marks[i], stud.total_marks);
+                    stud.final_marks = stud.final_marks + stud.total_marks;
+                    inc = inc + 2;
+                }
+                gotoxy(x,y+inc+inc1+4);
+                printf("Total Marks %13d%16d%15d\t     ", stud.total_internal_marks, stud.total_external_marks, stud.final_marks);
+                if (stud.final_marks > req.no_of_sub*90)
+                {
+                    printf("A1\n\n");
+                }
+                else if (stud.final_marks > req.no_of_sub*80 && stud.final_marks <= req.no_of_sub*90)
+                {
+                    printf("A2\n\n");
+                }
+                else if (stud.final_marks > req.no_of_sub*70 && stud.final_marks <= req.no_of_sub*80)
+                {
+                    printf("B1\n\n");
+                }
+                else if (stud.final_marks > req.no_of_sub*60 && stud.final_marks <= req.no_of_sub*70)
+                {
+                    printf("B2\n\n");
+                }
+                else if (stud.final_marks > req.no_of_sub*50 && stud.final_marks <= req.no_of_sub*60)
+                {
+                    printf("C1\n\n");
+                }
+                else if (stud.final_marks > req.no_of_sub*40 && stud.final_marks <= req.no_of_sub*50)
+                {
+                    printf("C2\n\n");
+                }
+                else if (stud.final_marks > req.no_of_sub*30 && stud.final_marks <= req.no_of_sub*40)
+                {
+                    printf("D1\n\n");
+                }
+                else if (stud.final_marks > req.no_of_sub*20 && stud.final_marks <= req.no_of_sub*10)
+                {
+                    printf("D2\n\n");
+                }
+                else if (stud.final_marks > req.no_of_sub*10 && stud.final_marks <= req.no_of_sub*20)
+                {
+                    printf("E1\n\n");
+                }
+                else if (stud.final_marks > req.no_of_sub*0 && stud.final_marks <= req.no_of_sub*10)
+                {
+                    printf("E2\n\n");
+                }
+                gotoxy(x,y+inc+inc1+8);
+                printf("------------------------------------------------------------------------");
+                inc = inc + 12;
+                gotoxy(x,y+inc+inc1+12);
+                printf("Press any key to get back to the search menu.");
+                getch();
+                search_menu_total();
+            }
+        }
+        system("cls");
+        gotoxy(x,y);
+        printf("Student does not exist.\n");
+        gotoxy(x,y+2);
+        printf("Press any key to get back to the search menu.");
+        getch();
+        search_menu_total();
+    }
+}
+
+
+void search_email_id_total()
+{
+    system("cls");
+    char email_id[50];
+    gotoxy(x,y);
+    printf("Enter the email - id of student whose record is to be searched : ");
+    scanf("%s", email_id);
+    fp = fopen("Subject.dat", "rb");
+    while (fread(&req, sizeof(req), 1, fp) > 0)
+    {
+        fp1 = fopen ("Student.dat", "rb");
+        while (fread(&stud, sizeof(stud), 1, fp1) > 0)
+        {
+            if (strcmp(stud.email_id, email_id) == 0)
+            {
+                int x = 45, y = 10;
+                system("cls");
+                gotoxy(x,y+inc+inc1);
+                printf("Roll Number = %d\n", stud.roll_no);
+                gotoxy(x+55,y+inc+inc1);
+                printf("Name = %s\n", stud.name);
+                gotoxy(x+15,y+inc+inc1+2);
+                printf("Internal Marks   External Marks   Total Marks  Grade\n");
+                stud.final_marks = 0;
+                for (i = 0; i < req.no_of_sub; i++)
+                {
+                    stud.total_marks = (((stud.internal_marks[i]*req.int_weightage)/100) + ((stud.external_marks[i]*req.ext_weightage)/100));
+                    gotoxy(x,y+inc+inc1+4);
+                    printf("%3s%22d%16d%15d\n", req.sub_name[i], stud.internal_marks[i], stud.external_marks[i], stud.total_marks);
+                    stud.final_marks = stud.final_marks + stud.total_marks;
+                    inc = inc + 2;
+                }
+                gotoxy(x,y+inc+inc1+4);
+                printf("Total Marks %13d%16d%15d\t     ", stud.total_internal_marks, stud.total_external_marks, stud.final_marks);
+                if (stud.final_marks > req.no_of_sub*90)
+                {
+                    printf("A1\n\n");
+                }
+                else if (stud.final_marks > req.no_of_sub*80 && stud.final_marks <= req.no_of_sub*90)
+                {
+                    printf("A2\n\n");
+                }
+                else if (stud.final_marks > req.no_of_sub*70 && stud.final_marks <= req.no_of_sub*80)
+                {
+                    printf("B1\n\n");
+                }
+                else if (stud.final_marks > req.no_of_sub*60 && stud.final_marks <= req.no_of_sub*70)
+                {
+                    printf("B2\n\n");
+                }
+                else if (stud.final_marks > req.no_of_sub*50 && stud.final_marks <= req.no_of_sub*60)
+                {
+                    printf("C1\n\n");
+                }
+                else if (stud.final_marks > req.no_of_sub*40 && stud.final_marks <= req.no_of_sub*50)
+                {
+                    printf("C2\n\n");
+                }
+                else if (stud.final_marks > req.no_of_sub*30 && stud.final_marks <= req.no_of_sub*40)
+                {
+                    printf("D1\n\n");
+                }
+                else if (stud.final_marks > req.no_of_sub*20 && stud.final_marks <= req.no_of_sub*10)
+                {
+                    printf("D2\n\n");
+                }
+                else if (stud.final_marks > req.no_of_sub*10 && stud.final_marks <= req.no_of_sub*20)
+                {
+                    printf("E1\n\n");
+                }
+                else if (stud.final_marks > req.no_of_sub*0 && stud.final_marks <= req.no_of_sub*10)
+                {
+                    printf("E2\n\n");
+                }
+                gotoxy(x,y+inc+inc1+8);
+                printf("------------------------------------------------------------------------");
+                inc = inc + 12;
+                gotoxy(x,y+inc+inc1+12);
+                printf("Press any key to get back to the search menu.");
+                getch();
+                search_menu_total();
+            }
+        }
+        system("cls");
+        gotoxy(x,y);
+        printf("Student does not exist.\n");
+        gotoxy(x,y+2);
+        printf("Press any key to get back to the search menu.");
+        getch();
+        search_menu_total();
+    }
+}
+
+
+void internal_marks()
+{
+    int count, res;
+    FILE *fp2;
+    fp = fopen("Subject.dat", "rb");
+    while(fread(&req, sizeof(req), 1, fp) > 0)
+    {
+        fp2 = fopen("Temp.dat", "wb+");
+        fp1 = fopen("Student.dat", "rb+");
+        while(fread(&stud, sizeof(stud), 1, fp1) > 0)
+        {
+            system("cls");
+            if (stud.attendance < ATTENDANCE)
+            {
+                goto out;
+            }
+            else
+            {
+                res = strcmp(stud.fee_status,"Paid");
+                count = 0;
+                if (res == 0)
+                {
+                    count++;
+                }
+                if (count != 0)
+                {
+                    stud.total_internal_marks = 0;
+                    inc = 2;
+                    gotoxy(x,y+inc);
+                    printf("Enter the internal marks of : ");
+                    gotoxy(x,y+inc+2);
+                    printf("Roll Number : %d", stud.roll_no);
+                    gotoxy(x,y+inc+4);
+                    printf("Name : %s", stud.name);
+                    for (i = 0; i < req.no_of_sub; i++)
+                    {
+                        gotoxy(x,y+inc+6);
+                        printf("%s : ", req.sub_name[i]);
+                        scanf("%d", &stud.internal_marks[i]);
+                        stud.total_internal_marks = stud.total_internal_marks + stud.internal_marks[i];
+                        inc = inc + 2;
+                    }
+                }
+                out:
+                    fwrite(&stud, sizeof(stud), 1, fp2);
+                    continue;
+            }
+        }
+    }
+    fclose(fp);
+    fclose(fp1);
+    fclose(fp2);
+    remove("Student.dat");
+    rename("Temp.dat", "Student.dat");
+    system("cls");
+    gotoxy(x,y);
+    printf("The marks of students are updated.");
+    gotoxy(x,y+2);
+    printf("Press any key to get back to the internal marks menu.");
+    getch();
+    internal_marks_menu();
+}
+
+
+void internal_marks_mod()
+{
+    system("cls");
+    int mod, count, res;
+    FILE *fp2;
+    fp = fopen("Subject.dat", "rb");
+    while (fread(&req, sizeof(req), 1, fp) > 0)
+    {
+        fp2 = fopen("Temp.dat", "wb+");
+        fp1 = fopen("Student.dat", "rb+");
+        gotoxy(x,y);
+        printf("Enter the roll number of student whose internal marks are to be entered : ");
+        scanf("%d", &mod);
+        while (fread(&stud, sizeof(stud), 1, fp1) > 0)
+        {
+            if (stud.roll_no == mod)
+            {
+                if (stud.attendance < ATTENDANCE)
+                {
+                    goto out;
+                }
+                else
+                {
+                    res = strcmp(stud.fee_status, "Paid");
+                    count = 0;
+                    if (res == 0)
+                    {
+                        count++;
+                    }
+                    if (count != 0)
+                    {
+                        stud.total_internal_marks = 0;
+                        inc = 2;
+                        gotoxy(x,y+inc);
+                        printf("Enter the internal marks of : ");
+                        gotoxy(x,y+inc+2);
+                        printf("Roll Number : %d", stud.roll_no);
+                        gotoxy(x,y+inc+4);
+                        printf("Name : %s", stud.name);
+                        for (i = 0; i < req.no_of_sub; i++)
+                        {
+                            gotoxy(x,y+inc+6);
+                            printf("%s : ", req.sub_name[i]);
+                            scanf("%d", &stud.internal_marks[i]);
+                            stud.total_internal_marks = stud.total_internal_marks + stud.internal_marks[i];
+                            inc = inc + 2;
+                        }
+                        goto out1;
+                    }
+                    out:
+                        system("cls");
+                        gotoxy(x,y);
+                        printf("The selected student does not qualify for internals.");
+                        gotoxy(x,y+2);
+                        printf("Press any key to get back to the internal marks menu.");
+                        fwrite(&stud, sizeof(stud), 1, fp2);
+                        continue;
+                    out1:
+                        system("cls");
+                        gotoxy(x,y);
+                        printf("The internal marks of the selected student are updated.");
+                        gotoxy(x,y+2);
+                        printf("Press any key to get back to the internal marks menu.");
+                        fwrite(&stud, sizeof(stud), 1, fp2);
+                }
+            }
+            else
+            {
+                fwrite(&stud, sizeof(stud), 1, fp2);
+            }
+        }
+        fclose(fp);
+        fclose(fp1);
+        fclose(fp2);
+        remove("Student.dat");
+        rename("Temp.dat", "Student.dat");
+        getch();
+        internal_marks_menu();
+    }
+}
+
+
+void display_internal_marks()
+{
+    system("cls");
+    int count, res;
+    fp = fopen("Subject.dat", "rb");
+    while(fread(&req, sizeof(req), 1, fp) > 0)
+    {
+        fp1 = fopen("Student.dat", "rb");
+        while(fread(&stud, sizeof(stud), 1, fp1) > 0)
+        {
+            if (stud.attendance < ATTENDANCE)
+            {
+                goto out;
+            }
+            else
+            {
+                res = strcmp(stud.fee_status,"Paid");
+                count = 0;
+                if (res == 0)
+                {
+                    count++;
+                }
+                if (count != 0)
+                {
+                    for (i = 0; i < req.no_of_sub; i++)
+                    {
+                        gotoxy(x,y+inc+inc1);
+                        printf("Roll Number : %d\n", stud.roll_no);
+                        gotoxy(x,y+inc+inc1+2);
+                        printf("Name : %s\n", stud.name);
+                        gotoxy(x,y+inc+inc1+4);
+                        printf("Mobile Number : %lld", stud.mob_no);
+                        gotoxy(x,y+inc+inc1+6);
+                        printf("Email - ID : %s", stud.email_id);
+                        gotoxy(x,y+inc+inc1+8);
+                        printf("Internal Marks in : ");
+                        for (i = 0; i < req.no_of_sub; i++)
+                        {
+                            gotoxy(x,y+inc+inc1+10);
+                            printf("%s : %d\n", req.sub_name[i], stud.internal_marks[i]);
+                            inc = inc + 2;
+                        }
+                        gotoxy(x,y+inc+inc1+10);
+                        printf("Total Marks in Internals are : %d\n", stud.total_internal_marks);
+                        inc1 = inc1 + 14;
+                    }
+                }
+                out:
+                    continue;
+            }
+        }
+    }
+    fclose(fp);
+    fclose(fp1);
+    gotoxy(x,y+inc+inc1+2);
+    printf("Press any key to get back to the internal marks menu.");
+    getch();
+    internal_marks_menu();
+}
+
+
+void eligibility_externals()
+{
+    system("cls");
+    int count, res, count1;
+    fp = fopen("Subject.dat", "rb");
+    while(fread(&req, sizeof(req), 1, fp) > 0)
+        {
+        fp1 = fopen("Student.dat", "rb");
+        while(fread(&stud, sizeof(stud), 1, fp1) > 0)
+        {
+            if (stud.attendance < ATTENDANCE)
+            {
+                goto out;
+            }
+            else
+            {
+                for (i = 0; i < req.no_of_sub; i++)
+                {
+                    count = 0;
+                    if (stud.internal_marks[i] < PASSING_MARKS)
+                    {
+                        goto out;
+                    }
+                    else
+                    {
+                        count++;
+                    }
+                }
+                res = strcmp(stud.fee_status,"Paid");
+                count1 = 0;
+                if (res == 0)
+                {
+                    count1++;
+                }
+                if (count != 0 && count1 != 0)
+                {
+                    gotoxy(x,y+inc);
+                    printf("Roll Number  = %d", stud.roll_no);
+                    gotoxy(x,y+inc+2);
+                    printf("Name = %s", stud.name);
+                    gotoxy(x,y+inc+4);
+                    printf("Mobile Number = %lld", stud.mob_no);
+                    gotoxy(x,y+inc+6);
+                    printf("Email - ID = %s", stud.email_id);
+                    inc = inc + 10;
+                }
+                out:
+                    continue;
+            }
+        }
+    }
+    fclose(fp);
+    fclose(fp1);
+    gotoxy(x,y+inc+2);
+    printf("Press any key to get back to the internal marks menu.");
+    getch();
+    internal_marks_menu();
+}
+
+
+void external_marks()
+{
+    system("cls");
+    int count, res, count1;
+    FILE *fp2;
+    fp = fopen("Subject.dat", "rb");
+    while(fread(&req, sizeof(req), 1, fp) > 0)
+    {
+    fp2 = fopen("Temp.dat", "wb+");
+    fp1 = fopen("Student.dat", "rb+");
+    while(fread(&stud, sizeof(stud), 1, fp1) > 0)
+    {
+        system("cls");
+        inc  = 2;
+        if (stud.attendance < ATTENDANCE)
+        {
+            goto out;
+        }
+        else
+        {
+            for (i = 0; i < req.no_of_sub; i++)
+            {
+                count = 0;
+                if (stud.internal_marks[i] < PASSING_MARKS)
+                {
+                    goto out;
+                }
+                else
+                {
+                    count++;
+                }
+            }
+            res = strcmp(stud.fee_status,"Paid");
+            count1 = 0;
+            if (res == 0)
+            {
+                count1++;
+            }
+            if (count != 0 && count1 != 0)
+            {
+                stud.total_external_marks = 0;
+                inc = 2;
+                gotoxy(x,y+inc);
+                printf("Enter the external marks of : ");
+                gotoxy(x,y+inc+2);
+                printf("Roll Number : %d", stud.roll_no);
+                gotoxy(x,y+inc+4);
+                printf("Name : %s", stud.name);
+                for (i = 0; i < req.no_of_sub; i++)
+                    {
+                        gotoxy(x,y+inc+6);
+                        printf("%s : ", req.sub_name[i]);
+                        scanf("%d", &stud.external_marks[i]);
+                        stud.total_external_marks = stud.total_external_marks + stud.external_marks[i];
+                        inc = inc + 2;
+                    }
+            }
+            out:
+                fwrite(&stud, sizeof(stud), 1, fp2);
+                continue;
+        }
+    }
+    }
+    fclose(fp);
+    fclose(fp1);
+    fclose(fp2);
+    remove("Student.dat");
+    rename("Temp.dat", "Student.dat");
+    system("cls");
+    gotoxy(x,y);
+    printf("The marks of students are updated.");
+    gotoxy(x,y+2);
+    printf("Press any key to get back to the external marks menu.");
+    getch();
+    external_marks_menu();
+}
+
+
+void external_marks_mod()
+{
+    system("cls");
+    int mod, count, count1, res;
+    FILE *fp2;
+    fp = fopen("Subject.dat", "rb");
+    while(fread(&req, sizeof(req), 1, fp) > 0)
+    {
+        fp2 = fopen("Temp.dat", "wb+");
+        fp1 = fopen("Student.dat", "rb+");
+        gotoxy(x,y);
+        printf("Enter the roll number of student whose external marks are to be entered : ");
+        scanf("%d", &mod);
+        while(fread(&stud, sizeof(stud), 1, fp1) > 0)
+        {
+            if (stud.roll_no == mod)
+            {
+                if (stud.attendance < ATTENDANCE)
+                {
+                    goto out;
+                }
+                else
+                {
+                    for (i = 0; i < req.no_of_sub; i++)
+                    {
+                        count = 0;
+                        if (stud.internal_marks[i] < PASSING_MARKS)
+                        {
+                            goto out;
+                        }
+                        else
+                        {
+                            count++;
+                        }
+                    }
+                    res = strcmp(stud.fee_status,"Paid");
+                    count1 = 0;
+                    if (res == 0)
+                    {
+                        count1++;
+                    }
+                    if (count != 0 && count1 != 0)
+                    {
+                        stud.total_external_marks = 0;
+                        inc = 2;
+                        gotoxy(x,y+inc);
+                        printf("Enter the external marks of : ");
+                        gotoxy(x,y+inc+2);
+                        printf("Roll Number : %d", stud.roll_no);
+                        gotoxy(x,y+inc+4);
+                        printf("Name : %s", stud.name);
+                        for (i = 0; i < req.no_of_sub; i++)
+                        {
+                            gotoxy(x,y+inc+6);
+                            printf("%s : ", req.sub_name[i]);
+                            scanf("%d", &stud.external_marks[i]);
+                            stud.total_external_marks = stud.total_external_marks + stud.external_marks[i];
+                            inc = inc + 2;
+                        }
+                        goto out1;
+                    }
+                    out:
+                        system("cls");
+                        gotoxy(x,y);
+                        printf("The selected student does not qualify for externals.");
+                        gotoxy(x,y+2);
+                        printf("Press any key to get back to the external marks menu.");
+                        fwrite(&stud, sizeof(stud), 1, fp2);
+                        continue;
+                    out1:
+                        system("cls");
+                        gotoxy(x,y);
+                        printf("The external marks of the selected student are updated.");
+                        gotoxy(x,y+2);
+                        printf("Press any key to get back to the external marks menu.");
+                        fwrite(&stud, sizeof(stud), 1, fp2);
+                }
+            }
+            else
+            {
+                fwrite(&stud, sizeof(stud), 1, fp2);
+            }
+        }
+        fclose(fp);
+        fclose(fp1);
+        fclose(fp2);
+        remove("Student.dat");
+        rename("Temp.dat", "Student.dat");
+        getch();
+        external_marks_menu();
+    }
+}
+
+
+void display_external_marks()
+{
+    system("cls");
+    int count, res, count1;
+    fp = fopen("Subject.dat", "rb");
+    while(fread(&req, sizeof(req), 1, fp) > 0)
+    {
+        fp1 = fopen("Student.dat", "rb");
+        while(fread(&stud, sizeof(stud), 1, fp1) > 0)
+        {
+            if (stud.attendance < ATTENDANCE)
+            {
+                goto out;
+            }
+            else
+            {
+                for (i = 0; i < req.no_of_sub; i++)
+                {
+                    count = 0;
+                    if (stud.internal_marks[i] < PASSING_MARKS)
+                    {
+                        goto out;
+                    }
+                    else
+                    {
+                        count++;
+                    }
+                }
+                res = strcmp(stud.fee_status,"Paid");
+                count1 = 0;
+                if (res == 0)
+                {
+                    count1++;
+                }
+                if (count != 0 && count1 != 0)
+                {
+                    for (i = 0; i < req.no_of_sub; i++)
+                    {
+                        gotoxy(x,y+inc+inc1);
+                        printf("Roll Number : %d\n", stud.roll_no);
+                        gotoxy(x,y+inc+inc1+2);
+                        printf("Name : %s\n", stud.name);
+                        gotoxy(x,y+inc+inc1+4);
+                        printf("Mobile Number : %lld", stud.mob_no);
+                        gotoxy(x,y+inc+inc1+6);
+                        printf("Email - ID : %s", stud.email_id);
+                        gotoxy(x,y+inc+inc1+8);
+                        printf("External Marks in : ");
+                        for (i = 0; i < req.no_of_sub; i++)
+                        {
+                            gotoxy(x,y+inc+inc1+10);
+                            printf("%s : %d\n", req.sub_name[i], stud.external_marks[i]);
+                            inc = inc + 2;
+                        }
+                        gotoxy(x,y+inc+inc1+10);
+                        printf("Total Marks in Externals are : %d\n", stud.total_external_marks);
+                        inc1 = inc1 + 14;
+                    }
+                }
+                out:
+                    continue;
+            }
+        }
+    }
+    fclose(fp);
+    fclose(fp1);
+    gotoxy(x,y+inc+inc1+2);
+    printf("Press any key to get back to the external marks menu.");
+    getch();
+    external_marks_menu();
+}
+
+
+void display_total_marks()
+{
+    system("cls");
+    int count, res, count1;
+    fp = fopen("Subject.dat", "rb");
+    while(fread(&req, sizeof(req), 1, fp) > 0)
+    {
+    fp1 = fopen("Student.dat", "rb");
+    while(fread(&stud, sizeof(stud), 1, fp1) > 0)
+    {
+        if (stud.attendance < ATTENDANCE)
+        {
+            goto out;
+        }
+        else
+        {
+            for (i = 0; i < req.no_of_sub; i++)
+            {
+                count = 0;
+                if (stud.internal_marks[i] < PASSING_MARKS)
+                {
+                    goto out;
+                }
+                else
+                {
+                    count++;
+                }
+            }
+            res = strcmp(stud.fee_status,"Paid");
+            count1 = 0;
+            if (res == 0)
+            {
+                count1++;
+            }
+            if (count != 0 && count1 != 0)
+            {
+                for (i = 0; i < req.no_of_sub; i++)
+                {
+                    gotoxy(x,y+inc+inc1);
+                    printf("Roll Number = %d\n", stud.roll_no);
+                    gotoxy(x+55,y+inc+inc1);
+                    printf("Name = %s\n", stud.name);
+                    gotoxy(x+15,y+inc+inc1+2);
+                    printf("Internal Marks   External Marks   Total Marks  Grade\n");
+                    stud.final_marks = 0;
+                    for (i = 0; i < req.no_of_sub; i++)
+                    {
+                        stud.total_marks = (((stud.internal_marks[i]*req.int_weightage)/100) + ((stud.external_marks[i]*req.ext_weightage)/100));
+                        gotoxy(x,y+inc+inc1+4);
+                        printf("%3s%22d%16d%15d\n", req.sub_name[i], stud.internal_marks[i], stud.external_marks[i], stud.total_marks);
+                        stud.final_marks = stud.final_marks + stud.total_marks;
+                        inc = inc + 2;
+                    }
+                    gotoxy(x,y+inc+inc1+4);
+                    printf("Total Marks %13d%16d%15d\t     ", stud.total_internal_marks, stud.total_external_marks, stud.final_marks);
+                    if (stud.final_marks > req.no_of_sub*90)
+                    {
+                        printf("A1\n\n");
+                    }
+                    else if (stud.final_marks > req.no_of_sub*80 && stud.final_marks <= req.no_of_sub*90)
+                    {
+                        printf("A2\n\n");
+                    }
+                    else if (stud.final_marks > req.no_of_sub*70 && stud.final_marks <= req.no_of_sub*80)
+                    {
+                        printf("B1\n\n");
+                    }
+                    else if (stud.final_marks > req.no_of_sub*60 && stud.final_marks <= req.no_of_sub*70)
+                    {
+                        printf("B2\n\n");
+                    }
+                    else if (stud.final_marks > req.no_of_sub*50 && stud.final_marks <= req.no_of_sub*60)
+                    {
+                        printf("C1\n\n");
+                    }
+                    else if (stud.final_marks > req.no_of_sub*40 && stud.final_marks <= req.no_of_sub*50)
+                    {
+                        printf("C2\n\n");
+                    }
+                    else if (stud.final_marks > req.no_of_sub*30 && stud.final_marks <= req.no_of_sub*40)
+                    {
+                        printf("D1\n\n");
+                    }
+                    else if (stud.final_marks > req.no_of_sub*20 && stud.final_marks <= req.no_of_sub*10)
+                    {
+                        printf("D2\n\n");
+                    }
+                    else if (stud.final_marks > req.no_of_sub*10 && stud.final_marks <= req.no_of_sub*20)
+                    {
+                        printf("E1\n\n");
+                    }
+                    else if (stud.final_marks > req.no_of_sub*0 && stud.final_marks <= req.no_of_sub*10)
+                    {
+                        printf("E2\n\n");
+                    }
+                    gotoxy(x,y+inc+inc1+8);
+                    printf("------------------------------------------------------------------------");
+                    inc = inc + 12;
+                }
+            }
+            out:
+                continue;
+        }
+    }
+    }
+    fclose(fp);
+    fclose(fp1);
+    getch();
+    total_marks_menu();
+}
+
+
+void bye_bye()
+{
+    system("cls");
+    time_t t;
+    time(&t);
+    printf("%s\n", ctime(&t));
+    gotoxy(x,y);
+    printf("Total number of records in the system are : %d\n", get_no_rec());
+    gotoxy(x,y+4);
+    printf("Thank You!\n");
+    gotoxy(x,y+6);
+    printf("For using Examination Management System.\n");
+    gotoxy(x,y+8);
+    printf("Presented By : \n");
+    gotoxy(x,y+10);
+    printf("USN - Subhradeep Acharya\n");
+    gotoxy(x,y+12);
+    printf("USN - Sumit Rana\n");
+    gotoxy(x,y+14);
+    printf("USN - Tushar Agarwal\n");
+    gotoxy(x,y+16);
+    printf("USN - Trisha Moitra\n");
+    gotoxy(x,y+18);
+    printf("USN - Shivani\n");
+    gotoxy(x,y+20);
+    printf("Press any key to exit.\n");
+    gotoxy(x,y+22);
+    getch();
+    exit (0);
+}
+
+
+int get_no_rec()
+{
+    int n, ans;
+    fp = fopen("Student.dat", "rb+");
+    fseek(fp, 0, SEEK_END);
+    ans = ftell(fp);
+    n = ans/sizeof(stud);
+    fclose(fp);
+    return n;
+}
+
+
+void gotoxy(int x,int y)
+{
+HANDLE out = GetStdHandle(STD_OUTPUT_HANDLE);
+COORD new={x,y};
+SetConsoleCursorPosition(out,new);
+}
+
+
+
+
+void title()
+{
+    system("cls");
+    time_t t;
+    time(&t);
+    printf("%s\n", ctime(&t));
+    gotoxy(77,20);
+    printf("<<<< Loading Please Wait >>>>");
+    gotoxy(71,24);
+    for(i=0; i < 5; i++)
+    {
+        printf("\t*(_)*");
+        Sleep(300);
+    }
+    printf("\n\n");
+    gotoxy(80,32);
+    printf("*  *  *  *  *  *  *  *");
+    gotoxy(80,34);
+    printf("*                    *");
+    gotoxy(80,36);
+    printf("*       Welcome      *");
+    gotoxy(80,38);
+    printf("*                    *");
+    gotoxy(80,40);
+    printf("*  *  *  *  *  *  *  *");
+    gotoxy(78,48);
+    printf("Press any key to continue.");
+    getch();
+    system("cls");
+    gotoxy(55,30);
+    printf("=========================== Examination Management System ===========================");
+    getch();
+    cust_menu();
+}
+
+
+
+
+
+
+
+int cfileexists(const char *path)
+{
+    FILE *fptr = fopen(path, "r");
+    if (fptr == NULL)
+    {
+        return 0;
+    }
+    else
+    {
+        fclose(fptr);
+        return 1;
+    }
+}
+
+
+
+
+void main_login()
+{
+    char pas[50];
+    system("cls");
+    time_t t;
+    time(&t);
+    printf("%s\n", ctime(&t));
+    gotoxy(42,10);
+    printf("Enter password : ");
+    scanf("%s", pas);
+    tp = fopen("Password.txt", "r+");
+    fgets(pa.pass, 25, tp);
+    if (strcmp(pas, pa.pass)==0)
+    {
+        Beep(1000, 100);
+        title();
+    }
+    else
+    {
+        int n;
+        gotoxy(42,14);
+        Beep(2000, 100);
+        printf("Wrong Password.");
+        gotoxy(42,16);
+        printf("Press 1 to enter password again.");
+        gotoxy(42,18);
+        printf("Press 2 to change your password.");
+        gotoxy(42,20);
+        scanf("%d", &n);
+        if (n == 1)
+        {
+            system("cls");
+            time_t t;
+            time(&t);
+            printf("%s\n", ctime(&t));
+            gotoxy(42,10);
+            printf("Enter password : ");
+            scanf("%s", pas);
+            tp = fopen("Password.txt", "r+");
+            fgets(pa.pass, 25, tp);
+            if (strcmp(pas, pa.pass)==0)
+            {
+                Beep(1000, 100);
+                title();
+            }
+            else
+            {
+                gotoxy(42,14);
+                Beep(2000, 100);
+                printf("Wrong Password Again.");
+                gotoxy(42,16);
+                printf("Press any key to exit the system.");
+                getch();
+                bye_bye();
+            }
+        }
+        else if (n == 2)
+        {
+            change_password();
+        }
+        else
+        {
+            gotoxy(42,24);
+            printf("Invalid Choice.");
+            gotoxy(42,26);
+            printf("Press any key to exit the system.");
+            getch();
+            bye_bye();
+        }
+    }
+}
+
+
+void password()
+{
+    char c, f;
+    int a;
+    char pas[50];
+    char path[100] = {"Password.txt"};
+    a = cfileexists(path);
+    system("cls");
+    time_t t;
+    time(&t);
+    printf("%s\n", ctime(&t));
+    gotoxy(x,y);
+    printf("Enter new password : ");
+    fflush(stdin);
+    gets(pa.pass);
+    gotoxy(x,y+2);
+    printf("Save password (Y/N) : ");
+    fflush(stdin);
+    scanf("%c", &c);
+    if( c == 'y' || c == 'Y')
+    {
+        tp = fopen("Password.txt", "w+");
+        fwrite(&pa, sizeof(pa), 1, tp);
+        fclose(tp);
+        gotoxy(x,y+6);
+        printf("Password Saved.");
+        gotoxy(x,y+8);
+        printf("Press any key to login.");
+        getch();
+        main_login();
+    }
+    else if( c == 'n' || c == 'N')
+    {
+        gotoxy(x,y+6);
+        printf("Password not saved.");
+        gotoxy(x,y+8);
+        printf("Press any key to continue.");
+        getch();
+        bye_bye();
+    }
+    else
+    {
+        gotoxy(x,y+6);
+        printf("Invalid Choice.");
+        gotoxy(x,y+8);
+        printf("Press any key to continue.");
+        getch();
+        bye_bye();
+    }
+}
+
+
+
+
+void change_password()
+{
+    int n;
+    char c, pas[50];
+    system("cls");
+    time_t t;
+    time(&t);
+    printf("%s\n", ctime(&t));
+    gotoxy(42,10);
+    printf("Enter old password : ");
+    scanf("%s", pas);
+    tp = fopen("Password.txt", "r+");
+    fgets(pa.pass, 25, tp);
+    if (strcmp(pas, pa.pass) == 0)
+    {
+        gotoxy(42,12);
+        printf("Enter new password : ");
+        fflush(stdin);
+        gets(pa.pass);
+        gotoxy(42,14);
+        printf("Save password (Y/N) : ");
+        fflush(stdin);
+        scanf("%c", &c);
+        if (c == 'y' || c == 'Y')
+        {
+            tp = fopen("Password.txt", "w+");
+            fwrite(&pa, sizeof(pa), 1, tp);
+            fclose(tp);
+            gotoxy(42,18);
+            printf("Password Saved");
+            gotoxy(42,20);
+            printf("Press any key to login.");
+            getch();
+            main_login();
+        }
+        else if (c == 'n' || c == 'N')
+        {
+            gotoxy(42,18);
+            printf("Password not saved.");
+            gotoxy(42,20);
+            printf("Press any key to continue.");
+            getch();
+            bye_bye();
+        }
+        else
+        {
+            gotoxy(42,18);
+            printf("Invalid Choice.");
+            gotoxy(42,20);
+            printf("Press any key to continue.");
+            getch();
+            bye_bye();
+        }
+    }
+    else
+    {
+        Beep(2000, 100);
+        gotoxy(42,16);
+        printf("Wrong Password.");
+        gotoxy(42,18);
+        printf("Press 1 to reset your password through Master Key.");
+        gotoxy(42,20);
+        printf("Press 2 to exit the system");
+        scanf("%d", &n);
+        if (n == 1)
+        {
+            forgot_password();
+        }
+        else if (n == 2)
+        {
+            bye_bye;
+        }
+        else
+        {
+            gotoxy(42,26);
+            printf("Invalid Choice.");
+            gotoxy(42,28);
+            printf("Press any key to continue.");
+            getch();
+            bye_bye();
+        }
+    }
+}
+
+
+
+
+void forgot_password()
+{
+    char mpas[50]={"studentpbl"};
+    char c;
+    system("cls");
+    time_t t;
+    time(&t);
+    printf("%s\n", ctime(&t));
+    gotoxy(x,y);
+    printf("Enter the master password : ");
+    scanf("%s", mpas);
+    if(strcmp(mpas, "studentpbl") == 0)
+    {
+        Beep(500, 100);
+        gotoxy(x,y+2);
+        printf("Enter new password : ");
+        fflush(stdin);
+        gets(pa.pass);
+        gotoxy(x,y+4);
+        printf("Save password (Y/N) : ");
+        fflush(stdin);
+        scanf("%c", &c);
+        if (c == 'y' || c == 'Y')
+        {
+            tp = fopen("Password.txt", "w+");
+            fwrite(&pa, sizeof(pa), 1, tp);
+            fclose(tp);
+            gotoxy(x,y+8);
+            printf("Password Saved");
+            gotoxy(x,y+10);
+            printf("Press any key to login.");
+            getch();
+            main_login();
+        }
+        else if (c == 'n' || c == 'N')
+        {
+            gotoxy(x,y+8);
+            printf("Password not saved.");
+            gotoxy(x,y+10);
+            printf("Press any key to continue.");
+            getch();
+            bye_bye();
+        }
+        else
+        {
+            gotoxy(x,y+8);
+            printf("Invalid Choice.");
+            gotoxy(x,y+10);
+            printf("Press any key to continue.");
+            getch();
+            bye_bye();
+        }
+    }
+    else
+    {
+        gotoxy(x,y+4);
+        printf("Sorry your master password is wrong, you cannot reset the password.");
+        getch();
+        bye_bye();
+    }
+}
+
+
+
+
+void login()
+{
+    int m, pat, h;
+    char pas[50];
+    char path[100] = {"Password.txt"};
+    pat = cfileexists(path);
+    if (pat == 0)
+    {
+        SetConsoleTitle("Examination Management System");
+        time_t t;
+        time(&t);
+        printf("%s\n", ctime(&t));
+        system("color 9F");
+        gotoxy(55,28);
+        printf("Welcome to the Examination Management System.");
+        gotoxy(55,30);
+        printf("You are using it for the first time so let us start by creating a password.");
+        gotoxy(55,33);
+        printf("Press any key to create your password.");
+        getch();
+        password();
+    }
+    if (pat == 1)
+    {
+        SetConsoleTitle("Examination Management System ");
+        time_t t;
+        time(&t);
+        printf("%s\n", ctime(&t));
+        system("color 9F");
+        main_login();
+   }
+}
+
+
+void main()
+{
+    Beep(2000, 100);
+    login();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
